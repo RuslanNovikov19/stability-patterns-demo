@@ -12,3 +12,13 @@ resilience4j:
         max-concurrent-calls: 20
       SECOND_BULKHEAD:
         max-concurrent-calls: 20
+    metrics:
+      enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

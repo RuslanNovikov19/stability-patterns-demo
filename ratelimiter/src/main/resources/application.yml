@@ -14,3 +14,13 @@ resilience4j:
         timeoutDuration: 5s
         registerHealthIndicator: true
         eventConsumerBufferSize: 100
+    metrics:
+      enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

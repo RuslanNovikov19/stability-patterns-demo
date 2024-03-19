@@ -3,12 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.3</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>ru.itfb.com</groupId>
+        <artifactId>stability-patterns-demo</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <groupId>ru.itfb.com</groupId>
     <artifactId>ratelimiter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>ratelimiter</name>
@@ -47,9 +45,8 @@
             <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
 
