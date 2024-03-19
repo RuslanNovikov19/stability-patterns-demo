@@ -29,37 +29,23 @@ public class BulkheadApplicationTests {
     @Autowired
     private TestRestTemplate testRestTemplate;
 
-    static ExecutorService smallExecutorService = Executors.newFixedThreadPool(12);
+    ExecutorService smallExecutorService = Executors.newFixedThreadPool(12);
 
-    static ExecutorService largeExecutorService = Executors.newFixedThreadPool(300);
+    ExecutorService largeExecutorService = Executors.newFixedThreadPool(100);
 
     @Test
     void getThirdResourceConcurrentlyWithNumberOrThreadsOverwhelmingTomcatWorkersCountExpectServerError() {
         CopyOnWriteArrayList<Integer> statusList = new CopyOnWriteArrayList<>();
-        IntStream.range(0, 300).forEach(i -> largeExecutorService.execute(
+        IntStream.range(0, 100).forEach(i -> largeExecutorService.execute(
                 () -> statusList.add(performRequest("/bulkhead/resource/third", i))
         ));
         await().atMost(3
-                , TimeUnit.MINUTES).until(() -> statusList.size() == 300);
+                , TimeUnit.MINUTES).until(() -> statusList.size() == 100);
         assertThat(statusList.stream().filter(i -> i == 400).count()).isPositive();
     }
 
     @Test
-    void getFirstBulkheadResourceExpectMaxSuccessfulConcurrentCallsNotMoreThanLimitedByBulkhead() {
-        CopyOnWriteArrayList<Integer> firstResourceResponseStatuses = new CopyOnWriteArrayList<>();
-        IntStream.range(0, 12).forEach(i -> smallExecutorService.execute(
-                () -> firstResourceResponseStatuses.add(performRequest("/bulkhead/resource/first", i))
-        ));
-        await().atMost(1, TimeUnit.MINUTES).until(() -> firstResourceResponseStatuses.size() == 12);
-        assertThat(firstResourceResponseStatuses.stream().filter(i -> i == 200).count()).isEqualTo(8);
-        assertThat(firstResourceResponseStatuses.stream().filter(i -> i == 429).count()).isEqualTo(4);
-    }
-
-
-
-
-    @Test
-    void getFirstAndSecondBulkheadResourcesExpectLessTimesThanLimitedByBulkheadsExpectOk() {
+    void getFirstAndSecondBulkheadResourcesLessTimesThanLimitedByBulkheadsExpectOk() {
         CopyOnWriteArrayList<Integer> firstResourceResponseStatuses = new CopyOnWriteArrayList<>();
         CopyOnWriteArrayList<Integer> secondResourceResponseStatuses = new CopyOnWriteArrayList<>();
         IntStream.range(0, 6).forEach(i -> {
@@ -74,12 +60,35 @@ public class BulkheadApplicationTests {
                 }
         );
         await().atMost(1, TimeUnit.MINUTES).until(() ->
-                secondResourceResponseStatuses.size() == 6
-                        &&
-                        firstResourceResponseStatuses.size() == 6
+                secondResourceResponseStatuses.size() == 6 && firstResourceResponseStatuses.size() == 6
         );
         assertThat(secondResourceResponseStatuses.stream().filter(i -> i == 200).count()).isEqualTo(6);
         assertThat(firstResourceResponseStatuses.stream().filter(i -> i == 200).count()).isEqualTo(6);
+    }
+
+    @Test
+    void getFirstBulkheadResourceMoreTimesThanLimitedAndSecondResourceLessTimesThanLimitedExpectOkForSecondResourceCalls() throws InterruptedException {
+        CopyOnWriteArrayList<Integer> secondResourceResponseStatuses = new CopyOnWriteArrayList<>();
+        CopyOnWriteArrayList<Integer> firstResourceResponseStatuses = new CopyOnWriteArrayList<>();
+        IntStream.range(0, 15).forEach(i -> smallExecutorService.execute(
+                () -> firstResourceResponseStatuses.add(performRequest("/bulkhead/resource/first", i))
+        ));
+
+        Thread.sleep(3000L);
+
+        IntStream.range(0, 8).forEach(i ->
+
+                    largeExecutorService.execute(() ->
+                            secondResourceResponseStatuses.add(performRequest("/bulkhead/resource/second", i)
+                            )
+                    )
+        );
+
+        await().atMost(1, TimeUnit.MINUTES).until(() -> firstResourceResponseStatuses.size() == 15);
+        assertThat(firstResourceResponseStatuses.stream().filter(i -> i == 200).count()).isEqualTo(8);
+        assertThat(firstResourceResponseStatuses.stream().filter(i -> i == 429).count()).isEqualTo(7);
+        await().atMost(1, TimeUnit.MINUTES).until(() -> secondResourceResponseStatuses.size() == 8);
+        assertThat(secondResourceResponseStatuses.stream().filter(i -> i == 200).count()).isEqualTo(8);
     }
 
 

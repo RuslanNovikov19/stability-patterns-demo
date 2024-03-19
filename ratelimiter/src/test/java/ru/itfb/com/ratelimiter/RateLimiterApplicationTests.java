@@ -28,18 +28,27 @@ class RateLimiterApplicationTests {
     @Autowired
     private TestRestTemplate testRestTemplate;
 
-    static ExecutorService smallExecutorService = Executors.newFixedThreadPool(120);
-
-    static ExecutorService largeExecutorService = Executors.newFixedThreadPool(300);
+     ExecutorService smallExecutorService = Executors.newFixedThreadPool(20);
+     ExecutorService largeExecutorService = Executors.newFixedThreadPool(100);
 
     @Test
     void getSecondResourceManyTimesWithShortIntervalExpectConnectionException() {
         CopyOnWriteArrayList<Integer> statusList = new CopyOnWriteArrayList<>();
-        IntStream.range(0, 300).forEach(i -> largeExecutorService.execute(
+        IntStream.range(0, 100).forEach(i -> largeExecutorService.execute(
                 () -> statusList.add(performRequest("/ratelimiter/resource/second", i))
         ));
-        await().atMost(1, TimeUnit.MINUTES).until(() -> statusList.size() == 300);
+        await().atMost(1, TimeUnit.MINUTES).until(() -> statusList.size() == 100);
         assertThat(statusList.stream().filter(i -> i == 400).count()).isPositive();
+    }
+
+    @Test
+    void getFirstResourceLessTimesThanMaxAttemptsForPeriodExpectOk() {
+        CopyOnWriteArrayList<Integer> statusList = new CopyOnWriteArrayList<>();
+        IntStream.range(0, 5).forEach(i -> smallExecutorService.execute(
+                () -> statusList.add(performRequest("/ratelimiter/resource/first", i))
+        ));
+        await().atMost(1, TimeUnit.MINUTES).until(() -> statusList.size() == 5);
+        assertThat(statusList.stream().filter(i -> i == 200).count()).isEqualTo(5);
     }
 
     @Test

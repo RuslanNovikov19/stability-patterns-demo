@@ -2,6 +2,7 @@ package ru.itfb.com.ratelimiter.controller;
 
 
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,14 +18,16 @@ public class RateLimiterResourceController {
 
     @GetMapping("/first")
     @RateLimiter(name = "rateLimitingAPI")
-    public void getResourceFirst() throws InterruptedException {
-        LOGGER.log(Level.INFO, "Get resource first operation is performed");
+    public ResponseEntity<String> getResourceFirst() throws InterruptedException {
+        LOGGER.log(Level.INFO, "Get first rate limiter resource operation is performed");
         Thread.sleep(3000);
+        return ResponseEntity.ok("Get first rate limiter resource operation is performed");
     }
 
     @GetMapping("/second")
-    public void getResourceSecond() throws InterruptedException {
-        LOGGER.log(Level.INFO, "Get resource second operation is performed");
+    public ResponseEntity<String> getResourceSecond() throws InterruptedException {
+        LOGGER.log(Level.INFO, "Get second rate limiter resource operation is performed");
         Thread.sleep(3000);
+        return ResponseEntity.ok("Get second rate limiter resource operation is performed");
     }
 }

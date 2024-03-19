@@ -1,7 +1,7 @@
 server:
   tomcat:
-    threads:
-      max: 20
+    max-connections: 20
+    accept-count: 40
 
 resilience4j.bulkhead:
     instances:
