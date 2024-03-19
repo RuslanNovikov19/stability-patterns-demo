@@ -8,5 +8,7 @@ spring:
 resilience4j:
   bulkhead:
     instances:
-      RESOURCE_BULKHEAD:
+      FIRST_BULKHEAD:
+        max-concurrent-calls: 20
+      SECOND_BULKHEAD:
         max-concurrent-calls: 20

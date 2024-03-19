@@ -1,5 +1,6 @@
 package ru.itfb.com.ratelimiter;
 
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -47,8 +48,10 @@ class RateLimiterApplicationTests {
                     .andDo(print())
                     .andReturn();
             return mvcResult.getResponse().getStatus();
+        } catch (RequestNotPermitted e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

@@ -1,5 +1,11 @@
-resilience4j:
-  bulkhead:
+server:
+  tomcat:
+    threads:
+      max: 20
+
+resilience4j.bulkhead:
     instances:
-      RESOURCE_BULKHEAD:
-        max-concurrent-calls: 5
+      FIRST_BULKHEAD:
+        max-concurrent-calls: 10
+      SECOND_BULKHEAD:
+        max-concurrent-calls: 10

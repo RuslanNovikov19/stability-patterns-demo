@@ -2,6 +2,7 @@ package ru.itfb.com.bulkhead.controller;
 
 
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,10 +16,26 @@ public class BulkheadResourceController {
 
     private static final Logger LOGGER = Logger.getLogger(BulkheadResourceController.class.getSimpleName());
 
-    @GetMapping
-    @Bulkhead(name = "RESOURCE_BULKHEAD")
-    public void getResource() throws InterruptedException {
-        LOGGER.log(Level.INFO, "Get resource operation is performed");
-        Thread.sleep(1000);
+    @GetMapping("/first")
+    @Bulkhead(name = "FIRST_BULKHEAD", type = Bulkhead.Type.SEMAPHORE)
+    public ResponseEntity<String> getFirstResource() throws InterruptedException {
+        LOGGER.log(Level.INFO, "Get first resource operation is performed");
+        Thread.sleep(3000);
+        return ResponseEntity.ok("Get first resource operation is performed");
+    }
+
+    @GetMapping("/second")
+    @Bulkhead(name = "SECOND_BULKHEAD")
+    public ResponseEntity<String> getSecondResource() throws InterruptedException {
+        LOGGER.log(Level.INFO, "Get second resource operation is performed");
+        Thread.sleep(3000);
+        return ResponseEntity.ok("Get second resource operation is performed");
+    }
+
+    @GetMapping("/third")
+    public ResponseEntity<String> getThirdResource() throws InterruptedException {
+        LOGGER.log(Level.INFO, "Get third resource operation is performed");
+        Thread.sleep(10000);
+        return ResponseEntity.ok("Get third resource operation is performed");
     }
 }
