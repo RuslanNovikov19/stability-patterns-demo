@@ -6,6 +6,6 @@ server:
 resilience4j.bulkhead:
     instances:
       FIRST_BULKHEAD:
-        max-concurrent-calls: 10
+        max-concurrent-calls: 8
       SECOND_BULKHEAD:
-        max-concurrent-calls: 10
+        max-concurrent-calls: 8

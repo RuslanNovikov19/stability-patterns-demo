@@ -17,10 +17,10 @@ public class BulkheadResourceController {
     private static final Logger LOGGER = Logger.getLogger(BulkheadResourceController.class.getSimpleName());
 
     @GetMapping("/first")
-    @Bulkhead(name = "FIRST_BULKHEAD", type = Bulkhead.Type.SEMAPHORE)
+    @Bulkhead(name = "FIRST_BULKHEAD")
     public ResponseEntity<String> getFirstResource() throws InterruptedException {
         LOGGER.log(Level.INFO, "Get first resource operation is performed");
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         return ResponseEntity.ok("Get first resource operation is performed");
     }
 
@@ -28,14 +28,14 @@ public class BulkheadResourceController {
     @Bulkhead(name = "SECOND_BULKHEAD")
     public ResponseEntity<String> getSecondResource() throws InterruptedException {
         LOGGER.log(Level.INFO, "Get second resource operation is performed");
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         return ResponseEntity.ok("Get second resource operation is performed");
     }
 
     @GetMapping("/third")
     public ResponseEntity<String> getThirdResource() throws InterruptedException {
         LOGGER.log(Level.INFO, "Get third resource operation is performed");
-        Thread.sleep(10000);
+        Thread.sleep(8000);
         return ResponseEntity.ok("Get third resource operation is performed");
     }
 }
