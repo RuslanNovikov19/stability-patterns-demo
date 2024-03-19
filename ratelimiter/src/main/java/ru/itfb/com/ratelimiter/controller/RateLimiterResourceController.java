@@ -15,10 +15,16 @@ public class RateLimiterResourceController {
 
     private static final Logger LOGGER = Logger.getLogger(RateLimiterResourceController.class.getSimpleName());
 
-    @GetMapping
+    @GetMapping("/first")
     @RateLimiter(name = "rateLimitingAPI")
-    public void getResource() throws InterruptedException {
-        LOGGER.log(Level.INFO, "Get resource operation is performed");
-        Thread.sleep(1000);
+    public void getResourceFirst() throws InterruptedException {
+        LOGGER.log(Level.INFO, "Get resource first operation is performed");
+        Thread.sleep(3000);
+    }
+
+    @GetMapping("/second")
+    public void getResourceSecond() throws InterruptedException {
+        LOGGER.log(Level.INFO, "Get resource second operation is performed");
+        Thread.sleep(3000);
     }
 }
